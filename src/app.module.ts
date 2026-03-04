@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PostagemModule } from './postagem/services/postagem.module';
+import { PostagemModule } from './postagem/postagem.module';
 import { Postagem } from './postagem/entities/postagem.entity';
-import { PostagemConroller } from './postagem/controllers/postagem.controler';  
+import { Tema } from './tema/entities/tema.entity'; 
+import { TemaModule } from './tema/tema.modules';
+
 
 
 @Module({
@@ -13,10 +15,11 @@ import { PostagemConroller } from './postagem/controllers/postagem.controler';
       username: 'root',
       password: 'root',
       database: 'db_blogpessoal',
-      entities: [Postagem],
+      entities: [Postagem, Tema],
       synchronize: true,
     }),
-    PostagemModule
+    PostagemModule,
+    TemaModule
   ],
   controllers: [],
   providers: [],
