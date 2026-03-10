@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Postagem } from "../entities/postagem.entity";
 import { ILike, Repository } from "typeorm";
 import { DeleteResult } from "typeorm/browser";
+import { TemaService } from "../../tema/services/tema.service";
 
 @Injectable()
 export class PostagemService{
@@ -10,19 +11,28 @@ export class PostagemService{
     constructor(
         @InjectRepository(Postagem)
         private postagemRepository: Repository<Postagem>,
+        private readonly temaService: TemaService
     ){}
 
-    async findAll(): Promise<Postagem[]>{
-        // SELECT * FROM tb_postagens
-        return this.postagemRepository.find();
-    }
-
+async findAll(): Promise<Postagem[]> {
+    return this.postagemRepository.find({
+        relations: {
+            tema: true,
+            usuario: true
+        }
+    });
+}
     async findById(id:number): Promise<Postagem>{
         //SELECT * FROM tb_postagens WHERE id =?;
         const postagem = await this.postagemRepository.findOne({
             where:{
                 id
-            }
+            },
+    relations:{
+        tema: true,
+        usuario: true
+    }
+
     })
 
     if(!postagem)
@@ -35,11 +45,17 @@ async findAllByTitulo(titulo: string): Promise<Postagem[]>{
     return this.postagemRepository.find({
         where:{
             titulo: ILike(`%${titulo}%`)
-        }
+        },
+    relations:{
+        tema: true,
+        usuario: true
+    }
+
     })
 }
 
 async create(postagem: Postagem): Promise<Postagem>{
+    await this.temaService.findById(postagem.tema.id);
     // INSERT INTO tb_postagens (titulo, texto) VALUES (?, ?);
     return await this.postagemRepository.save(postagem);
 
@@ -56,7 +72,8 @@ async update(postagem: Postagem): Promise<Postagem>{
     //texto = ?,
     //data = CURRENTE TIMESTAP()
     //WHERE ID = ?
-
+ await this.temaService.findById(postagem.id);
+ 
     return await this.postagemRepository.save(postagem);
 }
 
