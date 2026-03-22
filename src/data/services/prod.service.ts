@@ -5,6 +5,10 @@ import { TypeOrmOptionsFactory, TypeOrmModuleOptions } from '@nestjs/typeorm';
 export class ProdService implements TypeOrmOptionsFactory {
 
   createTypeOrmOptions(): TypeOrmModuleOptions {
+
+    console.log('USANDO PRODUÇÃO');
+    console.log('DATABASE_URL:', process.env.DATABASE_URL);
+
     return {
       type: 'postgres',
       url: process.env.DATABASE_URL,
